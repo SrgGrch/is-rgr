@@ -5,17 +5,17 @@ namespace RGR.models {
     public class Event {
         public Event() { }
 
-        public Event(int id, string name, string description, DateTime date, Place place, Company organizer,
-            EventType eventType, List<User> participants, List<User> guests) {
+        public Event(int id, string name, string description, DateTime date, Place place, Company organizer, EventType eventType, List<User> participants, List<User> guests, List<Company> sponsors) {
             this.id = id;
             this.name = name;
-            description = description;
+            this.description = description;
             this.date = date;
             this.place = place;
             this.organizer = organizer;
             this.eventType = eventType;
             this.participants = participants;
             this.guests = guests;
+            this.sponsors = sponsors;
         }
 
         public int id { get; set; }
@@ -27,5 +27,7 @@ namespace RGR.models {
         public EventType eventType { get; set; }
         public List<User> participants { get; set; }
         public List<User> guests { get; set; }
+
+        public List<Company> sponsors { get; set; }
     }
 }

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Windows.Forms;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using RGR.models;
 
 namespace RGR {
@@ -19,14 +21,15 @@ namespace RGR {
             HttpClient = new HttpClient();
             InitializeComponent();
             loadEvents();
-            button_savePlace.Enabled = false;
         }
 
         private async void loadEvents() {
             var response = await HttpClient.GetAsync(_url + "Events/GetAll");
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
-            var events = JsonSerializer.Deserialize<List<Event>>(responseBody);
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            var events = JsonSerializer.Deserialize<List<Event>>(responseBody, options);
             this.events = events;
             currentEvent = events[currentIndex];
             drawEvent();
@@ -95,6 +98,21 @@ namespace RGR {
 
         private void textBox_placeId_TextChanged(object sender, EventArgs e) {
             newPlaceId = Int32.Parse(((TextBox) sender).Text);
+        }
+
+        private async void updateEvent() {
+            var content = new StringContent(JsonSerializer.Serialize(currentEvent), Encoding.UTF8, "application/json");
+            var responseMessage =  await HttpClient.PutAsync(_url + "Events/" + currentEvent.id, content);
+            loadEvents();
+        }
+
+        private void materialFlatButton1_Click(object sender, EventArgs e) {
+            updateEvent();
+        }
+
+        private void materialFlatButton3_Click(object sender, EventArgs e) {
+            currentEvent = events[currentIndex];
+            drawEvent();
         }
     }
 }
